@@ -39,17 +39,7 @@ const todoSlice = createSlice({
       },
       deleteTodo: (state, action: PayloadAction<string>) => {
         state.todos = state.todos.filter(
-          (todo) => todo.id !== action.payload
-        );
-      },
-      toggleComplete: (state, action: PayloadAction<string>) => {
-        state.todos = state.todos.filter(
-          (todo) => todo.id !== action.payload
-        );
-      },
-      toggleImportant:(state, action: PayloadAction<string>) => {
-        state.todos = state.todos.filter(
-          (todo) => todo.id !== action.payload
+          (todo) => todo.id === action.payload
         );
       },
       darkTheme: (state) => {
@@ -72,7 +62,6 @@ const todoSlice = createSlice({
     addTodoFail,
     updateTodo,
     deleteTodo,
-    toggleComplete
   } = todoSlice.actions
 
   export default todoSlice.reducer;

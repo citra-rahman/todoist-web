@@ -2,6 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import { ToDoProps } from "../../lib/type";
 import { setDoc } from "firebase/firestore";
+import { updateDoc } from "firebase/firestore";
 import { deleteDoc } from "firebase/firestore";
 import { collection } from "firebase/firestore";
 import { getDoc } from "firebase/firestore";
@@ -11,7 +12,6 @@ import { addTodo, getTodoError } from "./slice";
 import { addTodoFail } from "./slice";
 import { updateTodo } from "./slice";
 import { deleteTodo } from "./slice";
-import { toggleComplete } from "./slice";
 import { darkTheme, lightTheme } from "./slice";
 import { GoogleAuthProvider } from "firebase/auth";
 import { signInWithPopup } from "firebase/auth";
@@ -132,6 +132,33 @@ export const deleteTodoFromFirebaseDB = createAsyncThunk(
             ? error.response.data.message
             : error.message,
       });
+    }
+  }
+);
+
+
+export const updateImportantFromFirebaseDB = createAsyncThunk(
+  "todo/updateImportantFromFirebaseDB",
+  async (todoId:string, { dispatch, getState }) => {
+    const state = getState() as RootState;
+    const user = state.todo.user;
+    try {
+      const todoItemRef = doc(db, `${user?.uid as string}`, todoId);
+      const docSnap = await getDoc(todoItemRef);
+
+      if (docSnap.exists()) {
+        let existItem = docSnap.data();
+        existItem.isImportant = !existItem.isImportant;
+        await updateDoc(todoItemRef, existItem);
+      }
+    } catch (error: any) {
+      dispatch(
+        getTodoError(
+          error.response && error.response.data.message
+            ? error.response.data.message
+            : error.message
+        )
+      );
     }
   }
 );

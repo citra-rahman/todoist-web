@@ -1,21 +1,30 @@
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import StarIcon from '@mui/icons-material/Star';
+import StarOutlineIcon from '@mui/icons-material/StarOutline';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import { updateImportantFromFirebaseDB } from "../../redux/features/thunk";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { ToDoProps } from "../../lib/type";
+import { Typography } from "@mui/material";
 
 export default function ToDoList({
-id,
-name,
-date,
-isImportant,
-isCompleted,
-createdAt,
-updatedAt
+    id,
+    name,
+    date,
+    isImportant,
+    isCompleted,
+    createdAt,
+    updatedAt
 
 }: ToDoProps) {
+    const dispatch = useAppDispatch();
+
+    const handleUpdateImportant = () => {
+        dispatch(updateImportantFromFirebaseDB(id));
+    }
     return (
         <Stack
             display={'flex'}
@@ -35,22 +44,27 @@ updatedAt
                 flexDirection={'row'}
                 justifyContent={'start'}
                 alignItems={'center'}
-                spacing={2}
             >
                 {isCompleted ? (
-                    <CheckCircleIcon width={32} height={32} />
+                    <CheckCircleIcon />
                 ) : (
-                    <CheckCircleOutlineIcon width={32} height={32} />
+                    <CheckCircleOutlineIcon />
                 )}
-                {name}
+                <Typography sx={{ typography: { xs: "body2", md: "body1" } }}>{name}</Typography>
             </Stack>
             <Stack
                 display={'flex'}
                 flexDirection={'row'}
             >
-                <IconButton size="small" color="secondary">
-                    <StarIcon />
-                </IconButton>
+                {
+                    isImportant ?
+                        <IconButton size="small" color="secondary" onClick={handleUpdateImportant}>
+                            <StarIcon />
+                        </IconButton> :
+                        <IconButton size="small" onClick={handleUpdateImportant}>
+                            <StarOutlineIcon />
+                        </IconButton>
+                }
                 <IconButton size="small">
                     <MoreHorizIcon />
                 </IconButton>

@@ -58,7 +58,10 @@ export default function Home() {
         <Header />
         <Box sx={{ padding: '10vh 20vw' }}>
           <Box display={'flex'} sx={{ maxWidth: '100%', height: '35vh' }} spacing={1}>
-            <Typography variant="h5" gutterBottom>Important</Typography>
+            <Typography
+              sx={{ typography: { xs: 'h6', md: 'h5' } }}
+              gutterBottom
+            >Important</Typography>
             {
               data.filter(x => x.isImportant).map(item =>
                 <ToDoList
@@ -74,7 +77,10 @@ export default function Home() {
               )
             }
             <br />
-            <Typography variant="h5" gutterBottom>Tasks</Typography>
+            <Typography
+              sx={{ typography: { xs: 'h6', md: 'h5' } }}
+              gutterBottom
+            >Tasks</Typography>
             {
               data.filter(x => !x.isImportant).map(item =>
                 <ToDoList
@@ -95,8 +101,18 @@ export default function Home() {
           >
             <Input />
           </Box>
-          <br/>
-          <Typography sx={{textAlign:'right'}}>Design by <a href="https://dribbble.com/shots/20502706-Todo-App" target="_blank" rel="noreferrer">Clement</a></Typography>
+          <br />
+          <Typography
+            sx={{ textAlign: 'right' }}
+          >Design by
+            <a
+              href="https://dribbble.com/shots/20502706-Todo-App"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Clement
+            </a>
+          </Typography>
         </Box>
       </main>
     </ThemeProvider>

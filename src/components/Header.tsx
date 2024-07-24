@@ -11,6 +11,8 @@ import { logout } from "../redux/features/thunk";
 import { setUser } from "../redux/features/slice";
 import { onAuthStateChanged } from "firebase/auth";
 import ThemeSwitch from "./ThemeSwitch";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import Typography from "@mui/material/Typography";
 
 export default function Header() {
     const dispatch = useAppDispatch();
@@ -50,7 +52,18 @@ export default function Header() {
             paddingX={2}
             alignItems={'center'}>
             <ThemeSwitch />
-            <h1>Todo App</h1>
+            <Stack direction={'row'} alignItems={'center'}>
+                <CheckCircleIcon />
+                <Typography
+                    fontWeight={700}
+                    sx={{ 
+                        typography: { xs: "h5", md: "h4" } 
+                    }}
+                >
+                    Todo App
+                </Typography>
+            </Stack>
+
             {user ? (
                 <Tooltip title={"signout"}>
                     <IconButton onClick={handleLogout}>
