@@ -95,6 +95,8 @@ export default function Home() {
           >
             <Input />
           </Box>
+          <br/>
+          <Typography sx={{textAlign:'right'}}>Design by <a href="https://dribbble.com/shots/20502706-Todo-App" target="_blank" rel="noreferrer">Clement</a></Typography>
         </Box>
       </main>
     </ThemeProvider>
