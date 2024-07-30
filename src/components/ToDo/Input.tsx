@@ -1,42 +1,46 @@
-import { useState } from "react";
-import Button from "@mui/material/Button";
-import Paper from '@mui/material/Paper';
+import * as yup from 'yup';
 import InputBase from '@mui/material/InputBase';
 import AddIcon from '@mui/icons-material/Add';
+import { useFormik } from "formik";
+import Button from "@mui/material/Button";
 import { addTodoToFirebaseDB } from "../../redux/features/thunk";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { v4 as uuidv4 } from 'uuid';
 
 export default function Input() {
-    const [text, setText] = useState('');
     const user: any = useAppSelector((state) => state.todo.user);
     const dispatch = useAppDispatch();
 
-    const handleAddToDo = async () => {
-        if (user) {
-            const input = {
-                id: uuidv4().toString(),
-                name: text,
-                date: new Date(),
-                isImportant: false,
-                isCompleted: false,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-                user: user
+    const validationSchema = yup.object({
+        text: yup.string().trim().required('Required'),
+    });
+    const formik = useFormik({
+        initialValues: {
+            text: '',
+        },
+        validationSchema: validationSchema,
+        onSubmit: (values, actions) => {
+            if (user) {
+                const input = {
+                    id: uuidv4().toString(),
+                    name: values.text,
+                    date: new Date(),
+                    isImportant: false,
+                    isCompleted: false,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    user: user
+                }
+                dispatch(addTodoToFirebaseDB(input));
             }
-            dispatch(addTodoToFirebaseDB(input));
-            setText('');
-        }
-    };
-
-    const handleChange = (event: any) => {
-        setText(event.target.value);
-    }
+            actions.resetForm({ values: {text: ''} });
+        },
+    });
 
     return (
-        <Paper
-            component="form"
-            sx={{
+        <form
+            onSubmit={formik.handleSubmit}
+            style={{
                 display: 'flex',
                 alignItems: 'center',
                 backgroundColor: 'rgba(255,255,255,0.4)'
@@ -44,14 +48,18 @@ export default function Input() {
         >
             <InputBase
                 sx={{ ml: 1, flex: 1 }}
+                id='text'
+                name='text'
+                value={formik.values.text}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={formik.touched.text && Boolean(formik.errors.text)}
                 placeholder="What do you need to do?"
-                inputProps={{ 'aria-label': 'What do you need to do' }}
-                onChange={handleChange}
             />
             <Button
                 variant='contained'
                 color='inherit'
-                onClick={handleAddToDo}
+                type='submit'
                 sx={{
                     width: '5vw',
                     backgroundColor: '#000',
@@ -61,6 +69,6 @@ export default function Input() {
             >
                 <AddIcon /> Add
             </Button>
-        </Paper>
+        </form>
     )
 }
