@@ -46,7 +46,6 @@ export default function Home() {
   useEffect(() => {
     if (user) {
       dispatch(getTodoFromFirebaseDB());
-      console.log("how many time it hits")
     }
   }, [dispatch, user]);
 
@@ -104,7 +103,7 @@ export default function Home() {
           <br />
           <Typography
             sx={{ textAlign: 'right' }}
-          >Design by
+          >Design by {' '}
             <a
               href="https://dribbble.com/shots/20502706-Todo-App"
               target="_blank"
