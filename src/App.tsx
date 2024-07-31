@@ -40,8 +40,10 @@ const lightTheme = createTheme({
 
 export default function Home() {
   const isDarkTheme = useAppSelector((state) => state.todo.isDarkTheme);
-  const data = useAppSelector((state) => state.todo.todos);
   const user: any = useAppSelector((state) => state.todo.user);
+  const data = useAppSelector((state) => state.todo.todos);
+  const tasks = data.filter(x => !x.isImportant);
+  const importantTasks = data.filter(x => x.isImportant);
   const editOnClick: string | null = useAppSelector((state) => state.todo.editOnClick);
   const dispatch = useAppDispatch();
 
@@ -64,44 +66,53 @@ export default function Home() {
               gutterBottom
             >Important</Typography>
             {
-              data.filter(x => x.isImportant).map(item => {
-                return item.id === editOnClick ? (
-                  <ToDoEdit
-                    key={item.id}
-                    id={item.id}
-                  />
-                ) : (
-                  <ToDoList
-                    key={item.id}
-                    id={item.id}
-                    name={item.name}
-                    isImportant={item.isImportant}
-                    isCompleted={item.isCompleted}
-                  />
-                )
-              })}
+              importantTasks.length > 0 ?
+                importantTasks.map(item => {
+                  return item.id === editOnClick ? (
+                    <ToDoEdit
+                      key={item.id}
+                      id={item.id}
+                    />
+                  ) : (
+                    <ToDoList
+                      key={item.id}
+                      id={item.id}
+                      name={item.name}
+                      isImportant={item.isImportant}
+                      isCompleted={item.isCompleted}
+                    />
+                  )
+                }) :
+                <Typography textAlign={'center'}>There is no important task.</Typography>
+            }
             <br />
             <Typography
               sx={{ typography: { xs: 'h6', md: 'h5' } }}
               gutterBottom
             >Tasks</Typography>
             {
-              data.filter(x => !x.isImportant).map(item => {
-                return item.id === editOnClick ? (
-                  <ToDoEdit
-                    key={item.id}
-                    id={item.id}
-                  />
-                ) : (
-                  <ToDoList
-                    key={item.id}
-                    id={item.id}
-                    name={item.name}
-                    isImportant={item.isImportant}
-                    isCompleted={item.isCompleted}
-                  />
-                )
-              })}
+              tasks.length > 0 ?
+                tasks.map(item => {
+                  return item.id === editOnClick ? (
+                    <ToDoEdit
+                      key={item.id}
+                      id={item.id}
+                    />
+                  ) : (
+                    <ToDoList
+                      key={item.id}
+                      id={item.id}
+                      name={item.name}
+                      isImportant={item.isImportant}
+                      isCompleted={item.isCompleted}
+                    />
+                  )
+                }) :
+                <Typography textAlign={'center'}>
+                  There is no task.
+                  {!user && <span> Please login to create one.</span>}
+                </Typography>
+            }
           </Box>
           <Box
             sx={{ paddingTop: '30vh' }}
