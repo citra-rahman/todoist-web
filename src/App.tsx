@@ -1,7 +1,8 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Typography from "@mui/material/Typography";
 import ToDoList from "./components/ToDo/List";
+import ToDoEdit from "./components/ToDo/Edit";
 import Header from "./components/Header";
 import { amber } from "@mui/material/colors";
 import { getTodoFromFirebaseDB } from "./redux/features/thunk";
@@ -16,6 +17,7 @@ import './App.css';
 const darkTheme = createTheme({
   palette: {
     mode: 'dark',
+    secondary: amber
   },
 });
 
@@ -24,7 +26,6 @@ const lightTheme = createTheme({
     mode: 'light',
     secondary: amber
   },
-
   components: {
     MuiCssBaseline: {
       styleOverrides: {
@@ -41,6 +42,7 @@ export default function Home() {
   const isDarkTheme = useAppSelector((state) => state.todo.isDarkTheme);
   const data = useAppSelector((state) => state.todo.todos);
   const user: any = useAppSelector((state) => state.todo.user);
+  const editOnClick: string | null = useAppSelector((state) => state.todo.editOnClick);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -62,38 +64,44 @@ export default function Home() {
               gutterBottom
             >Important</Typography>
             {
-              data.filter(x => x.isImportant).map(item =>
-                <ToDoList
-                  key={item.id}
-                  id={item.id}
-                  name={item.name}
-                  date={item.date}
-                  isImportant={item.isImportant}
-                  isCompleted={item.isCompleted}
-                  createdAt={item.createdAt}
-                  updatedAt={item.updatedAt}
-                />
-              )
-            }
+              data.filter(x => x.isImportant).map(item => {
+                return item.id === editOnClick ? (
+                  <ToDoEdit
+                    key={item.id}
+                    id={item.id}
+                  />
+                ) : (
+                  <ToDoList
+                    key={item.id}
+                    id={item.id}
+                    name={item.name}
+                    isImportant={item.isImportant}
+                    isCompleted={item.isCompleted}
+                  />
+                )
+              })}
             <br />
             <Typography
               sx={{ typography: { xs: 'h6', md: 'h5' } }}
               gutterBottom
             >Tasks</Typography>
             {
-              data.filter(x => !x.isImportant).map(item =>
-                <ToDoList
-                  key={item.id}
-                  id={item.id}
-                  name={item.name}
-                  date={item.date}
-                  isImportant={item.isImportant}
-                  isCompleted={item.isCompleted}
-                  createdAt={item.createdAt}
-                  updatedAt={item.updatedAt}
-                />
-              )
-            }
+              data.filter(x => !x.isImportant).map(item => {
+                return item.id === editOnClick ? (
+                  <ToDoEdit
+                    key={item.id}
+                    id={item.id}
+                  />
+                ) : (
+                  <ToDoList
+                    key={item.id}
+                    id={item.id}
+                    name={item.name}
+                    isImportant={item.isImportant}
+                    isCompleted={item.isCompleted}
+                  />
+                )
+              })}
           </Box>
           <Box
             sx={{ paddingTop: '30vh' }}

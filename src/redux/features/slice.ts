@@ -5,6 +5,7 @@ import { UserProps } from "../../lib/type";
 interface TodoState {
   todos: ToDoProps[];
   isDarkTheme: boolean|null;
+  editOnClick: string|null;
   todoError: string | null;
   error: string | null;
   user: UserProps | null;
@@ -13,6 +14,7 @@ interface TodoState {
 const initialState: TodoState = {
   todos: [],
   isDarkTheme: false,
+  editOnClick: null,
   error: null,
   todoError: null,
   user: null,
@@ -50,6 +52,9 @@ const todoSlice = createSlice({
         state.isDarkTheme = false;
         localStorage.removeItem(process.env.NEXT_IS_DARK_THEME!);
       },
+      editOnClick: (state,action: PayloadAction<string>) => {
+        state.editOnClick = action.payload
+      }
     },
   });
   
@@ -62,6 +67,7 @@ const todoSlice = createSlice({
     addTodoFail,
     updateTodo,
     deleteTodo,
+    editOnClick
   } = todoSlice.actions
 
   export default todoSlice.reducer;

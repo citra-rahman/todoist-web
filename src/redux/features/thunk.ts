@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import { ToDoProps } from "../../lib/type";
+import { UserProps } from "../../lib/type";
 import { setDoc } from "firebase/firestore";
 import { updateDoc } from "firebase/firestore";
 import { deleteDoc } from "firebase/firestore";
@@ -8,7 +9,7 @@ import { collection } from "firebase/firestore";
 import { getDoc } from "firebase/firestore";
 import { getDocs } from "firebase/firestore";
 import { doc } from "firebase/firestore";
-import { addTodo, getTodoError } from "./slice";
+import { addTodo, editOnClick, getTodoError } from "./slice";
 import { addTodoFail } from "./slice";
 import { updateTodo } from "./slice";
 import { deleteTodo } from "./slice";
@@ -34,6 +35,13 @@ export const toogleLightTheme = createAsyncThunk(
   "app/lighttheme",
   async (_, { dispatch }) => {
     dispatch(lightTheme());
+  }
+);
+
+export const eventEditOnClick = createAsyncThunk(
+  "app/eventEditOnClick",
+  async (id:string, { dispatch }) => {
+    dispatch(editOnClick(id));
   }
 );
 
@@ -92,14 +100,9 @@ export const getTodoFromFirebaseDB = createAsyncThunk(
   async (_, { getState, dispatch }) => {
     const state = getState() as RootState;
     const user = state.todo.user;
-    const getTodoItems = async (db: any) => {
-      const todoCol = collection(db, `${user?.uid as string}`);
-      const todoSnapshot = await getDocs(todoCol);
-      const todoList = todoSnapshot.docs.map((doc) => doc.data() as ToDoProps);
-      return todoList;
-    };
+
     try {
-      let allTodos = await getTodoItems(db);
+      let allTodos = await getTodoItems(db, user);
       dispatch(updateTodo(allTodos));
     } catch (error: any) {
       dispatch(
@@ -122,7 +125,7 @@ export const deleteTodoFromFirebaseDB = createAsyncThunk(
     try {
       dispatch(deleteTodo(id));
       await deleteDoc(doc(db, `${user?.uid as string}`, todoId));
-      notifySuccess(`Movie Id: ${id} was successfully deleted`);
+      notifySuccess(`Task Id: ${id} was successfully deleted`);
     } catch (error: any) {
       notifyError(`failed to remove  ${id}`);
       dispatch({
@@ -136,10 +139,9 @@ export const deleteTodoFromFirebaseDB = createAsyncThunk(
   }
 );
 
-
-export const updateImportantFromFirebaseDB = createAsyncThunk(
-  "todo/updateImportantFromFirebaseDB",
-  async (todoId:string, { dispatch, getState }) => {
+export const updateAsImportantFromFirebaseDB = createAsyncThunk(
+  "todo/updateAsImportantFromFirebaseDB",
+  async (todoId: string, { dispatch, getState }) => {
     const state = getState() as RootState;
     const user = state.todo.user;
     try {
@@ -150,6 +152,9 @@ export const updateImportantFromFirebaseDB = createAsyncThunk(
         let existItem = docSnap.data();
         existItem.isImportant = !existItem.isImportant;
         await updateDoc(todoItemRef, existItem);
+        let allTodos = await getTodoItems(db, user);
+        dispatch(updateTodo(allTodos));
+        notifySuccess(`Task Id: ${todoId} was successfully updated`);
       }
     } catch (error: any) {
       dispatch(
@@ -162,3 +167,69 @@ export const updateImportantFromFirebaseDB = createAsyncThunk(
     }
   }
 );
+
+export const updateAsCompletedFromFirebaseDB = createAsyncThunk(
+  "todo/updateAsCompletedFromFirebaseDB",
+  async (todoId: string, { dispatch, getState }) => {
+    const state = getState() as RootState;
+    const user = state.todo.user;
+    try {
+      const todoItemRef = doc(db, `${user?.uid as string}`, todoId);
+      const docSnap = await getDoc(todoItemRef);
+
+      if (docSnap.exists()) {
+        let existItem = docSnap.data();
+        existItem.isCompleted = !existItem.isCompleted;
+        await updateDoc(todoItemRef, existItem);
+        let allTodos = await getTodoItems(db, user);
+        dispatch(updateTodo(allTodos));
+        notifySuccess(`Task Id: ${todoId} was successfully updated`);
+      }
+    } catch (error: any) {
+      dispatch(
+        getTodoError(
+          error.response && error.response.data.message
+            ? error.response.data.message
+            : error.message
+        )
+      );
+    }
+  }
+);
+
+export const updateToDoTextFromFirebaseDB = createAsyncThunk(
+  "todo/updateToDoTextFromFirebaseDB",
+  async ({id, name}: {id:string, name:string}, { dispatch, getState }) => {
+    const state = getState() as RootState;
+    const user = state.todo.user;
+
+    try {
+      const todoItemRef = doc(db, `${user?.uid as string}`, id);
+      const docSnap = await getDoc(todoItemRef);
+
+      if (docSnap.exists()) {
+        await updateDoc(todoItemRef, {
+          name: name
+        });
+        let allTodos = await getTodoItems(db, user);
+        dispatch(updateTodo(allTodos));
+        notifySuccess(`Task Id: ${id} was successfully updated`);
+      }
+    } catch (error: any) {
+      dispatch(
+        getTodoError(
+          error.response && error.response.data.message
+            ? error.response.data.message
+            : error.message
+        )
+      );
+    }
+  }
+);
+
+const getTodoItems = async (db: any, user: UserProps | null) => {
+  const todoCol = collection(db, `${user?.uid as string}`);
+  const todoSnapshot = await getDocs(todoCol);
+  const todoList = todoSnapshot.docs.map((doc) => doc.data() as ToDoProps);
+  return todoList;
+};

@@ -26,3 +26,10 @@ export interface UserProps {
     createdAt: Date;
     updatedAt: Date;
   }
+
+  export interface ToDoShortProps{
+    id: string;
+    name: string;
+    isImportant: boolean;
+    isCompleted: boolean;
+  }
