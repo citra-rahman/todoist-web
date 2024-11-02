@@ -1,4 +1,4 @@
-# To DO App System Design
+# To Do App System Design
 ## System requirements
 
 ### Functional:
@@ -46,7 +46,7 @@
 ```mermaid
 classDiagram
 class Users{
-  +uid: string;
+  +id: string;
   -accessToken: string
   -auth: string
   +displayName: string
@@ -58,7 +58,7 @@ class Users{
   +updatedAt: datetime
 }
 class Tasks{
-  +uid: string
+  +id: string
   +name: string
   +deadlineDate: datetime
   +isCompleted: boolean
@@ -83,8 +83,20 @@ Notification Service: Sends notifications and reminders based on task due dates 
 Collaboration Service: Enables task sharing and assignment between users.
 
 3.Data Store:
-- Relational Database (e.g., PostgreSQL or MySQL) to manage structured data on users, tasks, and reminders.
+- NoSQL Database: Firestore.
 - Caching Layer:
 Redis or Memcached to cache frequently accessed data such as task lists to improve performance.
 4. Message Queue (for Notifications):
 - A queue system (e.g., RabbitMQ or Amazon SQS) to handle reminder notifications.
+
+# Setup in Local
+1. Clone the github repo (git clone https://github.com/citra-rahman/todoist-web.git).
+2. Create a file called `.env.local` and then paste data from .env.example.txt.
+3. Modify the config value in `.env.local` according to your firebase config.
+4. Run the project locally `npm start`.
+
+# Technology Stack
+- [ReactJS](https://react.dev/): library for building user interfaces.
+- [Firebase](https://firebase.google.com/): a backend solution to help developer experience.
+- [MUI](https://mui.com/): library for react components.
+- [Redux Toolkit](https://redux-toolkit.js.org/): state management tools.
